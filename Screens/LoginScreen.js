@@ -3,7 +3,6 @@ import {
   Text,
   TextInput,
   View,
-  // Image,
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
@@ -22,6 +21,10 @@ const LoginScreen = ({ navigation }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [state, setState] = useState(initialState);
+  const [isInputFocused, setInputFocused] = useState({
+    email: false,
+    password: false,
+  });
 
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
@@ -65,11 +68,26 @@ const LoginScreen = ({ navigation }) => {
                   onChangeText={(value) =>
                     setState((prevState) => ({ ...prevState, email: value }))
                   }
-                  onFocus={() => setIsShowKeyboard(true)}
-                  style={{
-                    ...styles.input,
-                    borderColor: "#E8E8E8",
+                  onFocus={() => {
+                    setIsShowKeyboard(true);
+                    setInputFocused((prev) => ({ ...prev, email: true }));
                   }}
+                  onBlur={() =>
+                    setInputFocused((prev) => ({ ...prev, email: false }))
+                  }
+                  style={
+                    isInputFocused.email
+                      ? {
+                          ...styles.input,
+                          backgroundColor: "#FFFFFF",
+                          borderColor: "#FF6C00",
+                        }
+                      : {
+                          ...styles.input,
+                          backgroundColor: "#F6F6F6",
+                          borderColor: "#E8E8E8",
+                        }
+                  }
                   placeholder="Email"
                   placeholderTextColor="#BDBDBD"
                   keyboardType="email-address"
@@ -83,11 +101,26 @@ const LoginScreen = ({ navigation }) => {
                         password: value,
                       }))
                     }
-                    onFocus={() => setIsShowKeyboard(true)}
-                    style={{
-                      ...styles.input,
-                      borderColor: "#E8E8E8",
+                    onFocus={() => {
+                      setIsShowKeyboard(true);
+                      setInputFocused((prev) => ({ ...prev, password: true }));
                     }}
+                    onBlur={() =>
+                      setInputFocused((prev) => ({ ...prev, password: false }))
+                    }
+                    style={
+                      isInputFocused.password
+                        ? {
+                            ...styles.input,
+                            backgroundColor: "#FFFFFF",
+                            borderColor: "#FF6C00",
+                          }
+                        : {
+                            ...styles.input,
+                            backgroundColor: "#F6F6F6",
+                            borderColor: "#E8E8E8",
+                          }
+                    }
                     placeholder="Password"
                     placeholderTextColor="#BDBDBD"
                     secureTextEntry={isPasswordHidden}
@@ -130,12 +163,8 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
     justifyContent: "flex-end",
-    // justifyContent: "center",
   },
   box: {
-    // flex: 1,
-    //     alignItems: "center",
-    // justifyContent: "center",
     position: "relative",
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 25,
@@ -143,20 +172,6 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
   },
-  //   photoBox: {
-  //     position: "absolute",
-  //     top: -60,
-  //     left: 131,
-  //     width: 120,
-  //     height: 120,
-  //     backgroundColor: "#F6F6F6",
-  //     borderRadius: 16,
-  //   },
-  //   photoIcon: {
-  //     position: "absolute",
-  //     bottom: 14,
-  //     right: -12,
-  //   },
   title: {
     fontFamily: "Roboto-Medium",
     fontWeight: 500,
@@ -169,17 +184,13 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   form: {
-    //   flex: 0.4,
     gap: 16,
-    // backgroundColor: "#fff",
-    // alignItems: "center",
   },
   input: {
     borderWidth: 1,
     borderRadius: 8,
     fontFamily: "Roboto-Regular",
     color: "#212121",
-    backgroundColor: "#F6F6F6",
     paddingLeft: 16,
     paddingTop: 16,
     paddingBottom: 15,

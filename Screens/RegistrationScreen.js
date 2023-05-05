@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useFonts } from "expo-font";
+import * as ImagePicker from "expo-image-picker";
 
 const initialState = {
   login: "",
@@ -23,6 +24,12 @@ const RegistrationScreen = ({ navigation }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [state, setState] = useState(initialState);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isInputFocused, setInputFocused] = useState({
+    login: false,
+    email: false,
+    password: false,
+  });
 
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
@@ -32,6 +39,25 @@ const RegistrationScreen = ({ navigation }) => {
   if (!fontsLoaded) {
     return null;
   }
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      alert("You did not select any image.");
+    }
+  };
+
+  const removeAvatar = () => {
+    setSelectedImage(null);
+  };
+
+  const imageSource = selectedImage !== null && { uri: selectedImage };
 
   const onShowPassword = () => {
     setIsPasswordHidden(!isPasswordHidden);
@@ -61,30 +87,54 @@ const RegistrationScreen = ({ navigation }) => {
               }}
             >
               <View style={styles.photoBox}>
-                <TouchableOpacity style={styles.photoIcon}>
-                  <Image source={require("../assets/add.png")} />
-                </TouchableOpacity>
+                {selectedImage ? (
+                  <>
+                    <Image source={imageSource} style={styles.avatar} />
+                    <TouchableOpacity
+                      style={styles.photoIconRemove}
+                      onPress={removeAvatar}
+                    >
+                      <Image source={require("../assets/remove.png")} />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.photoIconAdd}
+                    onPress={pickImageAsync}
+                  >
+                    <Image source={require("../assets/add.png")} />
+                  </TouchableOpacity>
+                )}
               </View>
               <Text style={styles.title}>Registration</Text>
-
-              {/* <View
-            // style={{
-            //   ...styles.form,
-            //   // marginBottom: isShowKeyboard ? 0 : 43,
-            // }}
-            > */}
 
               <TextInput
                 value={state.login}
                 onChangeText={(value) =>
                   setState((prevState) => ({ ...prevState, login: value }))
                 }
-                onFocus={() => setIsShowKeyboard(true)}
-                style={{
-                  ...styles.input,
-                  borderColor: "#E8E8E8",
-                  marginBottom: 16,
+                onFocus={() => {
+                  setIsShowKeyboard(true);
+                  setInputFocused((prev) => ({ ...prev, login: true }));
                 }}
+                onBlur={() => {
+                  setInputFocused((prev) => ({ ...prev, login: false }));
+                }}
+                style={
+                  isInputFocused.login
+                    ? {
+                        ...styles.input,
+                        backgroundColor: "#FFFFFF",
+                        borderColor: "#FF6C00",
+                        marginBottom: 16,
+                      }
+                    : {
+                        ...styles.input,
+                        backgroundColor: "#F6F6F6",
+                        borderColor: "#E8E8E8",
+                        marginBottom: 16,
+                      }
+                }
                 placeholder="Login"
                 placeholderTextColor="#BDBDBD"
               />
@@ -93,12 +143,28 @@ const RegistrationScreen = ({ navigation }) => {
                 onChangeText={(value) =>
                   setState((prevState) => ({ ...prevState, email: value }))
                 }
-                onFocus={() => setIsShowKeyboard(true)}
-                style={{
-                  ...styles.input,
-                  borderColor: "#E8E8E8",
-                  marginBottom: 16,
+                onFocus={() => {
+                  setIsShowKeyboard(true);
+                  setInputFocused((prev) => ({ ...prev, email: true }));
                 }}
+                onBlur={() =>
+                  setInputFocused((prev) => ({ ...prev, email: false }))
+                }
+                style={
+                  isInputFocused.email
+                    ? {
+                        ...styles.input,
+                        backgroundColor: "#FFFFFF",
+                        borderColor: "#FF6C00",
+                        marginBottom: 16,
+                      }
+                    : {
+                        ...styles.input,
+                        backgroundColor: "#F6F6F6",
+                        borderColor: "#E8E8E8",
+                        marginBottom: 16,
+                      }
+                }
                 placeholder="Email"
                 placeholderTextColor="#BDBDBD"
                 keyboardType="email-address"
@@ -112,11 +178,26 @@ const RegistrationScreen = ({ navigation }) => {
                       password: value,
                     }))
                   }
-                  onFocus={() => setIsShowKeyboard(true)}
-                  style={{
-                    ...styles.input,
-                    borderColor: "#E8E8E8",
+                  onFocus={() => {
+                    setIsShowKeyboard(true);
+                    setInputFocused((prev) => ({ ...prev, password: true }));
                   }}
+                  onBlur={() =>
+                    setInputFocused((prev) => ({ ...prev, password: false }))
+                  }
+                  style={
+                    isInputFocused.password
+                      ? {
+                          ...styles.input,
+                          backgroundColor: "#FFFFFF",
+                          borderColor: "#FF6C00",
+                        }
+                      : {
+                          ...styles.input,
+                          backgroundColor: "#F6F6F6",
+                          borderColor: "#E8E8E8",
+                        }
+                  }
                   placeholder="Password"
                   placeholderTextColor="#BDBDBD"
                   secureTextEntry={isPasswordHidden}
@@ -130,8 +211,6 @@ const RegistrationScreen = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
               </View>
-
-              {/* </View> */}
 
               <TouchableOpacity style={styles.button} onPress={onLogin}>
                 <Text style={styles.buttonText}>Sign up</Text>
@@ -161,12 +240,8 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
     justifyContent: "flex-end",
-    // justifyContent: "center",
   },
   box: {
-    // flex: 1,
-    //     alignItems: "center",
-    // justifyContent: "center",
     position: "relative",
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 25,
@@ -183,10 +258,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
   },
-  photoIcon: {
+  photoIconAdd: {
     position: "absolute",
     bottom: 14,
     right: -12,
+  },
+  photoIconRemove: {
+    position: "absolute",
+    bottom: 8.82,
+    right: -17.18,
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
   },
   title: {
     fontFamily: "Roboto-Medium",
@@ -199,25 +284,17 @@ const styles = StyleSheet.create({
     marginTop: 92,
     marginBottom: 33,
   },
-  form: {
-    //   flex: 0.4,
-    gap: 16,
-    // backgroundColor: "#fff",
-    // alignItems: "center",
-  },
   input: {
     borderWidth: 1,
     borderRadius: 8,
     fontFamily: "Roboto-Regular",
     color: "#212121",
-    backgroundColor: "#F6F6F6",
     paddingLeft: 16,
     paddingTop: 16,
     paddingBottom: 15,
     fontSize: 16,
     lineHeight: 19,
   },
-
   passwordBox: {
     position: "relative",
   },
