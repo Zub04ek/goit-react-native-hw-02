@@ -46,7 +46,12 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+        setIsShowKeyboard(false);
+      }}
+    >
       <View style={styles.container}>
         <ImageBackground
           style={styles.image}
@@ -55,28 +60,57 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.box}>
             <Text style={styles.title}>Log in</Text>
             <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              behavior={Platform.OS === "ios" ? "padding" : ""}
             >
-              <View
-                style={{
-                  ...styles.form,
-                  // marginBottom: isShowKeyboard ? 0 : 43,
+              <TextInput
+                value={state.email}
+                onChangeText={(value) =>
+                  setState((prevState) => ({ ...prevState, email: value }))
+                }
+                onFocus={() => {
+                  setIsShowKeyboard(true);
+                  setInputFocused((prev) => ({ ...prev, email: true }));
                 }}
-              >
+                onBlur={() =>
+                  setInputFocused((prev) => ({ ...prev, email: false }))
+                }
+                style={
+                  isInputFocused.email
+                    ? {
+                        ...styles.input,
+                        backgroundColor: "#FFFFFF",
+                        borderColor: "#FF6C00",
+                        marginBottom: 16,
+                      }
+                    : {
+                        ...styles.input,
+                        backgroundColor: "#F6F6F6",
+                        borderColor: "#E8E8E8",
+                        marginBottom: 16,
+                      }
+                }
+                placeholder="Email"
+                placeholderTextColor="#BDBDBD"
+                keyboardType="email-address"
+              />
+              <View style={styles.passwordBox}>
                 <TextInput
-                  value={state.email}
+                  value={state.password}
                   onChangeText={(value) =>
-                    setState((prevState) => ({ ...prevState, email: value }))
+                    setState((prevState) => ({
+                      ...prevState,
+                      password: value,
+                    }))
                   }
                   onFocus={() => {
                     setIsShowKeyboard(true);
-                    setInputFocused((prev) => ({ ...prev, email: true }));
+                    setInputFocused((prev) => ({ ...prev, password: true }));
                   }}
                   onBlur={() =>
-                    setInputFocused((prev) => ({ ...prev, email: false }))
+                    setInputFocused((prev) => ({ ...prev, password: false }))
                   }
                   style={
-                    isInputFocused.email
+                    isInputFocused.password
                       ? {
                           ...styles.input,
                           backgroundColor: "#FFFFFF",
@@ -88,60 +122,30 @@ const LoginScreen = ({ navigation }) => {
                           borderColor: "#E8E8E8",
                         }
                   }
-                  placeholder="Email"
+                  placeholder="Password"
                   placeholderTextColor="#BDBDBD"
-                  keyboardType="email-address"
+                  secureTextEntry={isPasswordHidden}
                 />
-                <View style={styles.passwordBox}>
-                  <TextInput
-                    value={state.password}
-                    onChangeText={(value) =>
-                      setState((prevState) => ({
-                        ...prevState,
-                        password: value,
-                      }))
-                    }
-                    onFocus={() => {
-                      setIsShowKeyboard(true);
-                      setInputFocused((prev) => ({ ...prev, password: true }));
-                    }}
-                    onBlur={() =>
-                      setInputFocused((prev) => ({ ...prev, password: false }))
-                    }
-                    style={
-                      isInputFocused.password
-                        ? {
-                            ...styles.input,
-                            backgroundColor: "#FFFFFF",
-                            borderColor: "#FF6C00",
-                          }
-                        : {
-                            ...styles.input,
-                            backgroundColor: "#F6F6F6",
-                            borderColor: "#E8E8E8",
-                          }
-                    }
-                    placeholder="Password"
-                    placeholderTextColor="#BDBDBD"
-                    secureTextEntry={isPasswordHidden}
-                  />
-                  <TouchableOpacity
-                    style={styles.showButton}
-                    onPress={onShowPassword}
-                  >
-                    <Text style={styles.showText}>
-                      {isPasswordHidden ? "Show" : "Hide"}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={styles.showButton}
+                  onPress={onShowPassword}
+                >
+                  <Text style={styles.showText}>
+                    {isPasswordHidden ? "Show" : "Hide"}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </KeyboardAvoidingView>
+
             <TouchableOpacity style={styles.button} onPress={onLogin}>
               <Text style={styles.buttonText}>Log in</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.signup}
+              style={{
+                ...styles.signup,
+                marginBottom: isShowKeyboard ? -100 : 111,
+              }}
               onPress={() => navigation.navigate("Sign up")}
             >
               <Text style={styles.signupText}>
@@ -165,7 +169,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   box: {
-    position: "relative",
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
@@ -183,9 +186,6 @@ const styles = StyleSheet.create({
     marginTop: 32,
     marginBottom: 32,
   },
-  form: {
-    gap: 16,
-  },
   input: {
     borderWidth: 1,
     borderRadius: 8,
@@ -197,7 +197,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
   },
-
   passwordBox: {
     position: "relative",
   },
@@ -230,7 +229,6 @@ const styles = StyleSheet.create({
   },
   signup: {
     marginTop: 16,
-    marginBottom: 111,
   },
   signupText: {
     fontFamily: "Roboto-Regular",

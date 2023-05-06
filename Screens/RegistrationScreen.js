@@ -70,44 +70,42 @@ const RegistrationScreen = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+        setIsShowKeyboard(false);
+      }}
+    >
       <View style={styles.container}>
         <ImageBackground
           style={styles.image}
           source={require("../assets/images/Photo-BG.jpg")}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : ""}
-            // style={{ flex: 1 }}
-          >
-            <View
-              style={{
-                ...styles.box,
-                // marginBottom: isShowKeyboard ? 0 : 43
-              }}
-            >
-              <View style={styles.photoBox}>
-                {selectedImage ? (
-                  <>
-                    <Image source={imageSource} style={styles.avatar} />
-                    <TouchableOpacity
-                      style={styles.photoIconRemove}
-                      onPress={removeAvatar}
-                    >
-                      <Image source={require("../assets/remove.png")} />
-                    </TouchableOpacity>
-                  </>
-                ) : (
+          <View style={styles.box}>
+            <View style={styles.photoBox}>
+              {selectedImage ? (
+                <>
+                  <Image source={imageSource} style={styles.avatar} />
                   <TouchableOpacity
-                    style={styles.photoIconAdd}
-                    onPress={pickImageAsync}
+                    style={styles.photoIconRemove}
+                    onPress={removeAvatar}
                   >
-                    <Image source={require("../assets/add.png")} />
+                    <Image source={require("../assets/remove.png")} />
                   </TouchableOpacity>
-                )}
-              </View>
-              <Text style={styles.title}>Registration</Text>
-
+                </>
+              ) : (
+                <TouchableOpacity
+                  style={styles.photoIconAdd}
+                  onPress={pickImageAsync}
+                >
+                  <Image source={require("../assets/add.png")} />
+                </TouchableOpacity>
+              )}
+            </View>
+            <Text style={styles.title}>Registration</Text>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : ""}
+            >
               <TextInput
                 value={state.login}
                 onChangeText={(value) =>
@@ -211,21 +209,24 @@ const RegistrationScreen = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
               </View>
+            </KeyboardAvoidingView>
 
-              <TouchableOpacity style={styles.button} onPress={onLogin}>
-                <Text style={styles.buttonText}>Sign up</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={onLogin}>
+              <Text style={styles.buttonText}>Sign up</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.login}
-                onPress={() => navigation.navigate("Log in")}
-              >
-                <Text style={styles.loginText}>
-                  Already have an account? Log in
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
+            <TouchableOpacity
+              style={{
+                ...styles.login,
+                marginBottom: isShowKeyboard ? -100 : 45,
+              }}
+              onPress={() => navigation.navigate("Log in")}
+            >
+              <Text style={styles.loginText}>
+                Already have an account? Log in
+              </Text>
+            </TouchableOpacity>
+          </View>
         </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
@@ -327,7 +328,6 @@ const styles = StyleSheet.create({
   },
   login: {
     marginTop: 16,
-    marginBottom: 45,
   },
   loginText: {
     fontFamily: "Roboto-Regular",
