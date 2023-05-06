@@ -1,4 +1,4 @@
-# Screenshots of progect on Android emulator
+# Screenshots of project on Android emulator
 
 ## 1. App.js and Registration Screen
 
